@@ -49,6 +49,15 @@ class BorrowSerializer(serializers.ModelSerializer):
     items = BorrowItemSerializer(many=True, read_only=True)
     items_payload = BorrowItemWriteSerializer(many=True, write_only=True, required=True)
 
+    def to_internal_value(self, data):
+        if hasattr(data, "copy"):
+            data = data.copy()
+        elif isinstance(data, dict):
+            data = {**data}
+        if isinstance(data, dict) and "items" in data and "items_payload" not in data:
+            data["items_payload"] = data.pop("items")
+        return super().to_internal_value(data)
+
     class Meta:
         model = Borrow
         fields = (

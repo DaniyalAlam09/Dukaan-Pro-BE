@@ -27,6 +27,16 @@ class SaleSerializer(serializers.ModelSerializer):
     items = SaleItemSerializer(many=True, read_only=True)
     items_payload = SaleItemWriteSerializer(many=True, write_only=True, required=True)
 
+    def to_internal_value(self, data):
+        # Accept `items` as an alias for `items_payload` (common in API clients / manual tests).
+        if hasattr(data, "copy"):
+            data = data.copy()
+        elif isinstance(data, dict):
+            data = {**data}
+        if isinstance(data, dict) and "items" in data and "items_payload" not in data:
+            data["items_payload"] = data.pop("items")
+        return super().to_internal_value(data)
+
     class Meta:
         model = Sale
         fields = (
