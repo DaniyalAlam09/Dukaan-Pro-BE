@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from urllib.parse import urlparse
 
 import dj_database_url
 from decouple import Csv, config
@@ -150,10 +151,27 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "authentication.User"
 
-CORS_ALLOWED_ORIGINS = config(
-    "CORS_ALLOWED_ORIGINS",
-    default="http://localhost:5173,https://dukaan-pro.vercel.app",
-    cast=Csv(),
+def _normalize_cors_origins(raw_values):
+    normalized = []
+    for value in raw_values:
+        origin = value.strip()
+        if not origin:
+            continue
+        # Render env values are often entered as hostnames; default to https.
+        if "://" not in origin:
+            origin = f"https://{origin}"
+        parsed = urlparse(origin)
+        if parsed.scheme in {"http", "https"} and parsed.netloc:
+            normalized.append(f"{parsed.scheme}://{parsed.netloc}")
+    return normalized
+
+
+CORS_ALLOWED_ORIGINS = _normalize_cors_origins(
+    config(
+        "CORS_ALLOWED_ORIGINS",
+        default="http://localhost:5173,https://dukaan-pro.vercel.app",
+        cast=Csv(),
+    )
 )
 
 REST_FRAMEWORK = {
