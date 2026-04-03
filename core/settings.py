@@ -100,7 +100,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=config("DATABASE_URL", default=f"sqlite:///{BASE_DIR/'db.sqlite3'}"),
+        default=config("DATABASE_URL", default=f"postgresql://dukaanpro_user:FcRJMki4yKKpLAdgBDf9gQC2bk5GNfgv@dpg-d77sut5m5p6s738ig9g0-a.oregon-postgres.render.com/dukaanpro"),
         conn_max_age=60,
     )
 }

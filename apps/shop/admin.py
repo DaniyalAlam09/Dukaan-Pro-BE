@@ -1,3 +1,4 @@
 from django.contrib import admin
+from apps.shop.models import ShopProfile
 
-# Register your models here.
+admin.site.register(ShopProfile)
